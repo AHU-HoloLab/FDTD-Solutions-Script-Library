@@ -23,12 +23,10 @@ Lumerical FDTD Solutions 仿真超表面（Metasurface）用到的脚本文件�
 `./source/结果分析/`: 如下
 
 ``` Lumerical
-
 FarField.lsf                # 远场投影
 PhaseAnalysis.lsf           # 扫描后相位分析
 CircularPolarization.lsf    # 圆极化分析
 EfficiencyAnalysis.lsf      # 效率分析
-
 ```
 
 ## 协议
