@@ -1,5 +1,7 @@
 ###################################################################
-# 远场投影
+# 远场投影 z处平面 速度慢 有畸变
+# 可修改 Setting->Far filed settings->override near field mesh 加速计算
+# ref: https://kx.lumerical.com/t/farfieldexact3d/61239/3
 ###################################################################
 
 ############################## 宏定义 ##############################
@@ -16,44 +18,24 @@ nm = 1e-9;
 pm = 1e-12;
 fm = 1e-15;
 
-# 时间
-s  = 1;
-ms = 1e-3;
-us = 1e-6;
-ns = 1e-9;
-ps = 1e-12;
-fs = 1e-15;
-
 # 波长
 lambda_red   = 655*nm;
 lambda_green = 532*nm;
 lambda_blue  = 473*nm;
 
-# 系统自带材料
-Si = "Si (Silicon) - Palik";
-SiO2 = "SiO2 (Glass) - Palik";
-Si3N4 = "Si3N4 (Silicon Nitride) - Phillip";
-Au = "Au (Gold) - Palik";
-Ag = "Ag (Silver) - Palik (0-2um)";
-
-# 以下材料若要使用需要先导入
-TiO2 = "TiO2 (Nanoparticles) - (405-635nm)";
-MgF2 = "MgF2 - (30-2000nm)";
-PDMS = "PDMS(Fluid) - (820-2500nm)";
-
 ############################ 宏定义结束 ############################
 
 ########################## 远场投影参数定义 #########################
 
-mname = "section_near"; #监视器名字
-index = 1; # 远场传播背景材料
+mname = "section_near"; #近场监视器名字
+index = 1; # 远场传播背景材料真空
 lambda_target = 532*nm; # 波长
-resolution = 100; # 分辨率
+resolution = 150; # 分辨率
 x_start = -3*mm;
 x_end = 3*mm;
 y_start = x_start;
 y_end = x_end;
-z = 3*mm; # 高度位置
+z = 2*mm; # 高度位置
 
 ###################################################################
 
@@ -67,8 +49,15 @@ Ez = pinch(E_far, 4, 3); # Ez分量
 RCP = Ex + Ey*1i; # 右旋圆偏振
 LCP = Ex - Ey*1i; # 左旋圆偏振
 
-E=pinch(E_far);
+E = pinch(E_far);
 E2_far = sum(abs(E)^2,3);
-E2 = abs(Ex)^2 + abs(Ey)^2;
-image(x, y, abs(RCP));
-message("运行结束");
+E2 = sqrt(abs(Ex)^2 + abs(Ey)^2);
+image(x, y, abs(RCP), "x", "y", "RCP");
+image(x, y, abs(LCP), "x", "y", "LCP");
+image(x, y, E2, "x", "y", "|E|^2");
+image(x, y, sqrt(E2), "x", "y", "|E|");
+?"[INFO] 运行结束";
+
+
+
+

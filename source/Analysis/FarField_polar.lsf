@@ -1,0 +1,52 @@
+###################################################################
+# 远场投影 1M处半球面 速度较快 无畸变
+###################################################################
+
+############################## 宏定义 ##############################
+
+clear;
+closeall;
+
+# 长度
+m  = 1e-0;
+cm = 1e-2;
+mm = 1e-3;
+um = 1e-6;
+nm = 1e-9;
+pm = 1e-12;
+fm = 1e-15;
+
+# 波长
+lambda_red   = 655*nm;
+lambda_green = 532*nm;
+lambda_blue  = 473*nm;
+
+############################ 宏定义结束 ############################
+
+########################## 远场投影参数定义 #########################
+
+mname = "section_near"; #近场监视器名字
+index = 1; # 远场传播背景材料真空
+lambda_target = 532*nm; # 波长
+resolution = 250; # 分辨率
+
+###################################################################
+
+E_far = farfieldvector3d(mname, 1, resolution, resolution); # 远场投影
+ux = farfieldux(mname,1, resolution, resolution); 
+uy = farfielduy(mname,1, resolution, resolution); 
+Ex = pinch(E_far, 3, 1); # Ex分量
+Ey = pinch(E_far, 3, 2); # Ey分量
+Ez = pinch(E_far, 3, 3); # Ez分量
+
+RCP = Ex + Ey*1i; # 右旋圆偏振
+LCP = Ex - Ey*1i; # 左旋圆偏振
+
+E=pinch(E_far);
+E2_far = sum(abs(E)^2,3);
+E2 = abs(Ex)^2 + abs(Ey)^2;
+image(ux, uy, abs(RCP), "ux", "uy", "RCP");
+image(ux, uy, abs(LCP), "ux", "uy", "LCP");
+image(ux, uy, E2, "ux", "uy", "|E|^2");
+image(ux, uy, sqrt(E2), "ux", "uy", "|E|");
+?"[INFO] 运行结束";

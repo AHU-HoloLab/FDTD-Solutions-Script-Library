@@ -1,0 +1,211 @@
+######################################################################
+# 
+######################################################################
+
+deleteall;
+clear;
+
+# 宏定义
+m  = 1e-0;
+mm = 1e-3;
+um = 1e-6;
+nm = 1e-9;
+pm = 1e-12;
+fm = 1e-15;
+
+s  = 1;
+ms = 1e-3;
+us = 1e-6;
+ns = 1e-9;
+ps = 1e-12;
+fs = 1e-15;
+
+lambda_red   = 655*nm;
+lambda_green = 532*nm;
+lambda_blue  = 473*nm;
+
+# 系统自带材料
+Si = "Si (Silicon) - Palik";
+SiO2 = "SiO2 (Glass) - Palik";
+Si3N4 = "Si3N4 (Silicon Nitride) - Phillip";
+Au = "Au (Gold) - Palik";
+Ag = "Ag (Silver) - Palik (0-2um)";
+
+# 以下材料若要使用需要先导入
+TiO2 = "TiO2 (Nanoparticles) - (405-635nm)";
+MgF2 = "MgF2 - (30-2000nm)";
+PDMS = "PDMS(Fluid) - (820-2500nm)";
+
+############################## 用户定义参数 ##############################
+
+# 数据文件路径
+NAME = "AHU.dat";
+Directory = "./";
+SaveDirectory = Directory;
+
+# 仿真参数
+Unit = 300*nm;
+Ant_Width = 100*nm;
+Ant_Length = 200*nm;
+Ant_Thick = 120*nm;
+Sub_thick = 1000*nm;
+Lambda = 632.8*nm;
+mesh_override = 30*nm;
+Lambda_start = Lambda;
+Lambda_stop =  Lambda;
+
+Ant_material = "etch";
+Sub_material_I = SiO2;
+
+################################ 定义结束 ################################
+
+# 开始构建模型
+Data_raw = readdata(Directory + NAME);
+N_x = Data_raw(1, 1);
+N_y = Data_raw(1, 2);
+
+Base_Width  = Unit * N_x;
+Base_Length = Unit * N_y;
+
+Base_Pos_x = Base_Width  / 2;
+Base_Pos_y = Base_Length / 2;
+
+addstructuregroup;
+set("name","Ant_Group");
+set("use relative coordinates", false);
+set("x", 0);   
+set("y", 0);
+set("z", 0);
+
+Data = Data_raw(2:end, 1:2);
+Pos_x = -Unit*N_x/2 + Unit / 2;
+Pos_y = -Unit*N_y/2 + Unit / 2;
+
+for(y = 1 : 1 : N_y)
+{
+     for(x = 1 : 1 : N_x)
+     {
+          addrect;
+          set("x", Pos_x);
+          set("y", Pos_y);
+          set("z", 0);
+          set("x span", Ant_Width);
+          set("y span", Ant_Length);
+          set("z span", Ant_Thick);
+          set("first axis", "z");
+          
+          set("material", Ant_material);
+          ant_name = "Ant[" + num2str(x) + "x" + num2str(y) + "]";
+          set("name", ant_name);
+          Theta = Data((y-1)*N_x + x, 2)/255*180;
+          set("rotation 1", Theta);
+          addtogroup("Ant_Group");
+          ?"( " + num2str((y-1)*N_x + x) + " of " + num2str(N_x * N_y) + " )"; #Show progress
+          Pos_x = Pos_x + Unit;
+     }
+     Pos_y = Pos_y + Unit;
+     Pos_x = -Unit*N_x/2 + Unit / 2;
+}
+
+####################################################################
+
+# 添加金层
+addrect;
+set("name", "Au");
+set("x", 0);
+set("x span", Unit*N_x);
+set("y", 0);
+set("y span", Unit*N_y);
+set("z", 0);
+set("z span", Ant_Thick);
+set("material", Au);
+
+# 添加基底
+addrect;
+set("name", "Substrate");
+set("x", 0);
+set("x span", Unit*N_x);
+set("y", 0);
+set("y span", Unit*N_y);
+zmax = getnamed("Ant_Group::Ant[1x1]", "z min");
+zmin = zmax - Sub_thick;
+set("z min", zmin);
+set("z max", zmax);
+set("material", Sub_material_I);
+
+####################################################################
+
+# 添加TFSF光源
+addtfsf;
+set("name", "source_X");
+set("injection axis","z");
+set("direction", "Forward");
+set("x", 0);
+set("x span",Unit*(N_x+1)*1.5);
+set("y", 0);
+set("y span",Unit*(N_y+1)*1.5);
+zmax = getnamed("Ant_Group::Ant[1x1]", "z max") + (1/4)*Lambda;
+zmin = getnamed("Ant_Group::Ant[1x1]", "z min") - (1/4)*Lambda;
+set("z max", zmax);
+set("z min", zmin);
+set("wavelength start", Lambda_start);
+set("wavelength stop", Lambda_stop);
+set("amplitude", 1);
+set("angle phi", 0);
+set("phase", 0);
+
+# 添加TFSF光源
+addtfsf;
+set("name", "source_Y");
+set("injection axis","z");
+set("direction", "Forward");
+set("x", 0);
+set("x span",Unit*(N_x+1)*1.5);
+set("y", 0);
+set("y span",Unit*(N_y+1)*1.5);
+zmax = getnamed("Ant_Group::Ant[1x1]", "z max") + (1/4)*Lambda;
+zmin = getnamed("Ant_Group::Ant[1x1]", "z min") - (1/4)*Lambda;
+set("z max", zmax);
+set("z min", zmin);
+set("wavelength start", Lambda_start);
+set("wavelength stop", Lambda_stop);
+set("amplitude", 1);
+set("angle phi", 90);
+set("phase", 90);
+
+####################################################################
+
+# 添加近场监视器
+addpower;
+set("name","section_near");
+ #1 = point, 2 = linear x, 3 = linear y, 4 = linear z,
+ #5 = 2D x-normal, 6 = 2D y-normal, 7 = 2D z-normal, 8 = 3D
+set("monitor type",7);
+set("x", 0);
+set("x span",Unit*(N_x+1));
+set("y", 0);
+set("y span",Unit*(N_y+1));
+z = getnamed("source_X", "z max") + (1/4)*Lambda;
+set("z", z);
+
+####################################################################
+
+# 添加FDTD仿真区域
+addfdtd;
+set("dimension",2);  #  1 = 2D, 2 = 3D
+set("x", 0);
+set("x span",Unit*N_x+Lambda);
+set("y", 0);
+set("y span",Unit*N_y+Lambda);
+# zmax = getnamed("Ant_Group::Ant[1x1]", "z max") + 2*f + (1/4)*Lambda;
+zmax = getnamed("source_X", "z max") + (2/4)*Lambda;
+zmin = getnamed("source_X", "z min") - (1/4)*Lambda;
+set("z min", zmin);
+set("z max", zmax);
+set("auto shutoff min", 1e-5);
+set("pml layers", 24);
+set("simulation time", 2000*fs);
+
+####################################################################
+
+message("构建完成");
