@@ -30,7 +30,7 @@ lambda_blue  = 473*nm;
 mname = "field_profile_monitor"; #近场监视器名字
 index = 1; # 远场传播背景材料真空
 lambda_target = 532*nm; # 波长
-resolution = 100; # 分辨率 过高的分辨率增加计算时间
+resolution = 200; # 分辨率 过高的分辨率增加计算时间
 z = 2*mm; # 高度位置
 # X Y 方向宽度建议为 z 的4倍
 x_start = -z * 2;

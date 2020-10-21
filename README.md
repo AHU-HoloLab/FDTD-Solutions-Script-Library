@@ -35,6 +35,10 @@ EfficiencyAnalysis.lsf      # 效率分析
 
 其他功能可以通过脚本片段自行组合实现
 
+## Benchmark
+
+`./Benchmark.md`: 对不同问题规模的基准测试，提供耗时参考。
+
 ## 协议
 
 * GNU GPLv3
