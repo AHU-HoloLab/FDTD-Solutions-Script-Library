@@ -1,0 +1,72 @@
+function year_to_day(year)
+{
+    days = (year-2000)*365 + floor((year-2000)/4)+1;#number of days from Jan 1st,2000 to Jan 1st, current year.
+    return days;
+}
+
+function month_to_day(month, year)
+{
+    days_per_month = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30];#How many extra days happened the month before during this year for each month
+    days = sum(days_per_month(1:month)) + (mod(year,4) == 0);#Add up those days & factor in leap year
+    return days;
+}
+
+function DateTimeToSeconds(time_string)
+{
+    second = str2num(substring(time_string, 18));
+    minute = str2num(substring(time_string, 15, 2));
+    hour = str2num(substring(time_string, 12, 2));
+    day = str2num(substring(time_string, 4, 2));
+    month = str2num(substring(time_string, 1, 2));
+    year = str2num(substring(time_string, 7, 4));
+    
+    days = day + month_to_day(month, year) + year_to_day(year);
+    hours = hour + 24*days;
+    minutes = minute+60*hours;
+    seconds = second + 60*minutes;
+    
+    return seconds;
+}
+
+function tic()
+{
+ fname_tic = "tic.txt";    # file name to store current time 
+ 
+ if(fileexists(fname_tic))
+ {
+     rm(fname_tic);# delete time file   
+ }
+ 
+ cmd="echo %date%-%time% > "+fname_tic; # system command to get current date & time and write to fname 
+ system(cmd);         # run command to get time and save to file
+ 
+ #return 0;   
+}
+
+function toc()
+{
+ fname_tic = "tic.txt";    # file name to store reference time 
+ fname_toc = "toc.txt";    # file name to store current time 
+    
+ cmd="echo %date%-%time% > "+fname_toc; # system command to get current date & time and write to fname 
+ system(cmd);         # run command to get time and save to file    
+    
+ if(~fileexists(fname_tic))
+ {
+     ?"Error: did not use 'tic' before 'toc'";
+ } 
+ 
+ if(fileexists(fname_tic))
+ {
+     ref_time = read(fname_tic);
+     ref_time = substring(ref_time,findstring(ref_time, ' ')+1);#Removes the first part of the string associated w/ the day of the week
+     cur_time = read(fname_toc);
+     cur_time = substring(cur_time,findstring(cur_time, ' ')+1);#Removes the first part of the string associated w/ the day of the week
+     TimeDiff = num2str(DateTimeToSeconds(cur_time) - DateTimeToSeconds(ref_time));
+     ?"Elapsed time is " + TimeDiff + " seconds." ;# delete time file
+ }  
+ 
+ rm(fname_toc); 
+ 
+ #return 0;   
+}
