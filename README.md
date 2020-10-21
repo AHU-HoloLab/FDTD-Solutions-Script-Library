@@ -20,13 +20,13 @@ Lumerical FDTD Solutions 仿真超表面（Metasurface）用到的脚本文件�
 
 `./source/Template.lsf`: 构建超表面阵列脚本模板
 
-`./source/GDSII`: 导出 GDSII 文件相关脚本
+`./source/GDSII`: 导出 GDSII 文件
 
 `./source/Analysis/`: 分析脚本
 
 ``` Lumerical
 FarField.lsf                # 远场投影(直角坐标)
-FarField_polar.lsf          # 远场投影(球坐标) 速度快 建议使用
+FarField_polar.lsf          # 远场投影(球坐标) 速度快无畸变 建议使用
 Diffraction.lsf             # 沿光轴衍射
 PhaseAnalysis.lsf           # 扫描后相位分析
 CircularPolarization.lsf    # 圆极化分析

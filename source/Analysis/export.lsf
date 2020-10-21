@@ -29,39 +29,39 @@ lambda_blue  = 473*nm;
 mname = "section_near"; #近场监视器名字
 index = 1; # 远场传播背景材料真空
 lambda_target = 532*nm; # 波长
-resolution_x = 150; # x向分辨率
-resolution_z = 150; # z向分辨率
+resolution_x = 100; # x向分辨率
+resolution_z = 100; # z向分辨率
 x_start = -8*um;
 x_end = 8*um;
 z_start = 0;
-z_end = 80*um;
+z_end = 30*um;
 y = 0;
 
 ###################################################################
 
 x = linspace(x_start, x_end, resolution_x);
 z = linspace(z_start, z_end, resolution_z);
-#E_far=farfieldexact3d(mname,x,y,z,{"field":"E", "f":1, "index":index}); # 远场投影
+E_far=farfieldexact3d(mname,x,y,z,{"field":"E", "f":1, "index":index}); # 远场投影
 
-#Ex = pinch(E_far, 4, 1); # Ex分量
-#Ey = pinch(E_far, 4, 2); # Ey分量
-#Ez = pinch(E_far, 4, 3); # Ez分量
+Ex = pinch(E_far, 4, 1); # Ex分量
+Ey = pinch(E_far, 4, 2); # Ey分量
+Ez = pinch(E_far, 4, 3); # Ez分量
 
-#RCP = Ex + Ey*1i; # 右旋圆偏振
-#LCP = Ex - Ey*1i; # 左旋圆偏振
+RCP = Ex + Ey*1i; # 右旋圆偏振
+LCP = Ex - Ey*1i; # 左旋圆偏振
 
-#E = pinch(E_far);
-#E2_far = sum(abs(E)^2,3);
-#E2 = abs(Ex)^2 + abs(Ey)^2;
+E = pinch(E_far);
+E2_far = sum(abs(E)^2,3);
+E2 = abs(Ex)^2 + abs(Ey)^2;
 
 # 向上传播图
-#image(x, z, abs(RCP)/max(abs(RCP)), "x", "z", "RCP");
+image(x, z, abs(RCP), "x", "z", "RCP");
 #image(x, z, abs(LCP), "x", "z", "LCP");
 #image(x, z, E2, "x", "z", "|E|^2");
 #image(x, z, sqrt(E2), "x", "z", "|E|");
 
 # 向右传播图
-#image(z, x, transpose(pinch(abs(RCP)))/max(abs(RCP)), "z", "x", "RCP");
+image(z, x, transpose(pinch(abs(RCP))), "z", "x", "RCP");
 #image(z, x, transpose(pinch(abs(LCP))), "z", "x", "LCP");
 #image(z, x, transpose(pinch(E2)), "z", "x", "|E|^2");
 #image(z, x, transpose(pinch(sqrt(E2))), "z", "x", "|E|");
@@ -72,6 +72,6 @@ Ey_axis = pinch(pinch(E_far_axis, 4, 2)); # Ey分量
 Ez_axis = pinch(pinch(E_far_axis, 4, 3)); # Ez分量
 RCP = Ex_axis + Ey_axis*1i; # 右旋圆偏振
 LCP = Ex_axis - Ey_axis*1i; # 左旋圆偏振
-plot(z*1e6, abs(RCP)/max(abs(RCP)), "z", "|E|", "FWH", "plot type=line, color=blue, pen=--, linewidth=2");
+plot(z*1e6, abs(RCP), "z", "|E|", "FWH", "plot type=line, color=blue, pen=--, linewidth=2");
 
 ?"[INFO] 运行结束";

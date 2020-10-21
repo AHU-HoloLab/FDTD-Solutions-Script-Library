@@ -25,10 +25,10 @@ lambda_blue  = 473*nm;
 
 ########################## 远场投影参数定义 #########################
 
-mname = "section_near"; #近场监视器名字
+mname = "field_profile_monitor"; #近场监视器名字
 index = 1; # 远场传播背景材料真空
 lambda_target = 532*nm; # 波长
-resolution = 250; # 分辨率
+resolution = 600; # 分辨率
 
 ###################################################################
 
@@ -45,8 +45,10 @@ LCP = Ex - Ey*1i; # 左旋圆偏振
 E=pinch(E_far);
 E2_far = sum(abs(E)^2,3);
 E2 = abs(Ex)^2 + abs(Ey)^2;
-image(ux, uy, abs(RCP), "ux", "uy", "RCP");
-image(ux, uy, abs(LCP), "ux", "uy", "LCP");
-image(ux, uy, E2, "ux", "uy", "|E|^2");
-image(ux, uy, sqrt(E2), "ux", "uy", "|E|");
+
+# 归一化处理
+image(ux, uy, abs(RCP)/max(abs(RCP)), "ux", "uy", "RCP");
+image(ux, uy, abs(LCP)/max(abs(LCP)), "ux", "uy", "LCP");
+image(ux, uy, E2/max(E2), "ux", "uy", "|E|^2");
+image(ux, uy, sqrt(E2)/max(sqrt(E2)), "ux", "uy", "|E|");
 ?"[INFO] 运行结束";

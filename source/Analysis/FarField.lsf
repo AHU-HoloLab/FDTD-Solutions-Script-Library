@@ -1,5 +1,5 @@
 ###################################################################
-# 远场投影 z处平面 速度慢 有畸变
+# 远场投影 z处平面 速度慢 有畸变（可矫正）
 # 可修改 Setting->Far filed settings->override near field mesh 加速计算
 # ref: https://kx.lumerical.com/t/farfieldexact3d/61239/3
 ###################################################################
@@ -27,17 +27,18 @@ lambda_blue  = 473*nm;
 
 ########################## 远场投影参数定义 #########################
 
-mname = "section_near"; #近场监视器名字
+mname = "field_profile_monitor"; #近场监视器名字
 index = 1; # 远场传播背景材料真空
 lambda_target = 532*nm; # 波长
-resolution = 150; # 分辨率
-x_start = -3*mm;
-x_end = 3*mm;
+resolution = 100; # 分辨率 过高的分辨率增加计算时间
+z = 2*mm; # 高度位置
+# X Y 方向宽度建议为 z 的4倍
+x_start = -z * 2;
+x_end = z * 2;
 y_start = x_start;
 y_end = x_end;
-z = 2*mm; # 高度位置
 
-###################################################################
+############################## 远场投影 ################################
 
 x = linspace(x_start, x_end, resolution);
 y = linspace(y_start, y_end, resolution);
@@ -50,12 +51,44 @@ RCP = Ex + Ey*1i; # 右旋圆偏振
 LCP = Ex - Ey*1i; # 左旋圆偏振
 
 E = pinch(E_far);
-E2_far = sum(abs(E)^2,3);
+E2_far = sum(abs(E)^2, 3);
 E2 = sqrt(abs(Ex)^2 + abs(Ey)^2);
-image(x, y, abs(RCP), "x", "y", "RCP");
-image(x, y, abs(LCP), "x", "y", "LCP");
-image(x, y, E2, "x", "y", "|E|^2");
-image(x, y, sqrt(E2), "x", "y", "|E|");
+image(x, y, abs(RCP)/max(abs(RCP)), "x", "y", "RCP");
+image(x, y, abs(LCP)/max(abs(LCP)), "x", "y", "LCP");
+image(x, y, E2/max(E2), "x", "y", "|E|^2");
+image(x, y, sqrt(E2)/max(sqrt(E2)), "x", "y", "|E|");
+
+############################# 畸变矫正部分 ##############################
+
+X = linspace(-resolution/2, resolution/2-1, resolution);
+Y = linspace(-resolution/2, resolution/2-1, resolution);
+PX = meshgridx(X, Y);
+PY = meshgridy(X, Y);
+R = resolution/4.*ones(resolution, resolution);
+
+BX = (PX*R) / (sqrt(PX*PX + PY*PY + R*R));
+BY = (PY*R) / (sqrt(PX*PX + PY*PY + R*R));
+BZ = (R *R) / (sqrt(PX*PX + PY*PY + R*R));
+BX = round(BX);
+BY = round(BY);
+I = abs(RCP);
+ret = zeros(resolution/2, resolution/2);
+for (i = 1:1:resolution)
+{
+    for (j = 1:1:resolution)
+    {
+        xx = BX(i,j)+resolution/4;
+        yy = -(BY(i,j)-resolution/4);
+        ret(xx,yy) = (ret(xx,yy)+I(i,j))/1.2;
+    }
+}
+# 矫正后的分辨率为原始分辨率的一半
+nx = linspace(x_start/2, x_end/2, resolution/2);
+ny = linspace(y_start/2, y_end/2, resolution/2);
+image(nx ,ny, ret, "x", "y", "Correction");
+
+###################################################################
+
 ?"[INFO] 运行结束";
 
 
