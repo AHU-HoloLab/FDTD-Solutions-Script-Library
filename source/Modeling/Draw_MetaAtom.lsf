@@ -1,0 +1,36 @@
+# 谨慎修改
+
+function Draw_MetaAtom_PB(filename, Unit, MetaAtom_W, MetaAtom_L, MetaAtom_H, MetaAtom_Material, N_step)
+{
+    m  = 1e-0;
+    mm = 1e-3;
+    um = 1e-6;
+    nm = 1e-9;
+    pm = 1e-12;
+    fm = 1e-15;
+    
+    #Parameter
+    #Unit = 300*nm;
+    #MetaAtom_W = 100*nm;
+    #MetaAtom_L = 200*nm;
+    #MetaAtom_H = 120*nm;
+    #MetaAtom_Material = "etch";
+    
+    addstructuregroup;
+    set("name","MetaAtom_Group");
+    set("use relative coordinates", true);
+    set("x", 0);   
+    set("y", 0);
+    set("z", 0);
+    
+    adduserprop("N_step", 0, N_step);
+    adduserprop("filename", 1, filename);    
+    adduserprop("MetaAtom_W", 2, MetaAtom_W);
+    adduserprop("MetaAtom_L", 2, MetaAtom_L);
+    adduserprop("MetaAtom_H", 2, MetaAtom_H);
+    adduserprop("Unit", 2, Unit);
+    adduserprop("MetaAtom_Material", 5, MetaAtom_Material);
+    
+    script = read("./core/PB.txt"); 
+    set("script", script); 
+}

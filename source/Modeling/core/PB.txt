@@ -1,0 +1,45 @@
+Data_raw = readdata(filename);
+N_x = Data_raw(1, 1);
+N_y = Data_raw(1, 2);
+Base_Width  = Unit * N_x;
+Base_Length = Unit * N_y;
+Base_Pos_x = Base_Width  / 2;
+Base_Pos_y = Base_Length / 2;
+Data = Data_raw(2:end, 1:2);
+Pos_x = -N_x/2*Unit + Unit/2;
+Pos_y = -N_y/2*Unit + Unit/2;
+props = struct;
+T = zeros(2,2);
+for(y = 1 : 1 : N_y)
+{
+    for(x = 1 : 1 : N_x)
+    {
+        Theta = Data((y-1)*N_x + x, 2)/N_step*pi;
+        T(1,1) = cos(Theta);
+        T(1,2) = -sin(Theta);
+        T(2,1) = sin(Theta);
+        T(2,2) = cos(Theta);
+        P1 = [-MetaAtom_W/2;  MetaAtom_L/2];
+        P2 = [ MetaAtom_W/2;  MetaAtom_L/2];
+        P3 = [ MetaAtom_W/2; -MetaAtom_L/2];
+        P4 = [-MetaAtom_W/2; -MetaAtom_L/2];
+        P1 = mult(T,P1);
+        P2 = mult(T,P2);
+        P3 = mult(T,P3);
+        P4 = mult(T,P4);
+        vtx = [P1(1), P1(2); P2(1), P2(2); P3(1), P3(2); P4(1), P4(2)];
+        name = "MetaAtom ("+num2str(x)+", "+num2str(y)+")";
+        props = { "x" : Pos_x,
+                  "y" : Pos_y,
+                  "z" : 0,
+                  "vertices" : vtx,
+                  "z span" : MetaAtom_H,
+                  "material" : MetaAtom_Material,
+                  "name" : name};
+        addpoly(props);
+        Pos_x = Pos_x + Unit;
+    }
+    Pos_y = Pos_y + Unit;
+    Pos_x = -N_y/2*Unit + Unit/2;
+}
+

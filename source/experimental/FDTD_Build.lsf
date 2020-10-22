@@ -1,0 +1,179 @@
+deleteall;
+clear;
+
+# Marco
+m  = 1e-0;
+mm = 1e-3;
+um = 1e-6;
+nm = 1e-9;
+pm = 1e-12;
+fm = 1e-15;
+
+s  = 1;
+ms = 1e-3;
+us = 1e-6;
+ns = 1e-9;
+ps = 1e-12;
+fs = 1e-15;
+
+lambda_red   = 655*nm;
+lambda_green = 532*nm;
+lambda_blue  = 473*nm;
+
+
+# Parameter
+Unit = 300*nm;
+MetaAtom_W = 100*nm;
+MetaAtom_L = 200*nm;
+MetaAtom_H = 120*nm;
+Sub_thick = 1000*nm;
+Lambda = 632.8*nm;
+mesh_override = 30*nm;
+MetaAtom_Material = "etch";
+#"TiO2 (Nanoparticles) - (405-635nm)"
+
+
+# Main Code
+NAME = "32_ZHONG";
+INPATH = "";
+OUTPATH = "";
+Data_raw = readdata(INPATH+NAME+".mdat");
+N_x = Data_raw(1, 1);
+N_y = Data_raw(1, 2);
+
+Base_Width  = Unit * N_x;
+Base_Length = Unit * N_y;
+
+Base_Pos_x = Base_Width  / 2;
+Base_Pos_y = Base_Length / 2;
+
+Data = Data_raw(2:end, 1:2);
+
+N_step = max(Data(1:end, 2));
+
+Pos_x = -N_x/2*Unit + Unit/2;
+Pos_y = -N_y/2*Unit + Unit/2;
+
+addrect;
+set("x", 0);
+set("y", 0);
+set("z", 0);
+set("x span", Unit*N_x);
+set("y span", Unit*N_y);
+set("z span", MetaAtom_H);
+set("material", "Au (Gold) - CRC");
+set("name", 'Au');
+
+addstructuregroup;
+set("name","MetaAtom_Group");
+set("use relative coordinates", true);
+set("x", 0);   
+set("y", 0);
+set("z", 0);
+T = zeros(2,2);
+for(y = 1 : 1 : N_y)
+{
+    for(x = 1 : 1 : N_x)
+    {
+        Theta = Data((y-1)*N_x + x, 2)/N_step*pi;
+        T(1,1) = cos(Theta);
+        T(1,2) = -sin(Theta);
+        T(2,1) = sin(Theta);
+        T(2,2) = cos(Theta);
+        
+        P1 = [-MetaAtom_W/2;  MetaAtom_L/2];
+        P2 = [ MetaAtom_W/2;  MetaAtom_L/2];
+        P3 = [ MetaAtom_W/2; -MetaAtom_L/2];
+        P4 = [-MetaAtom_W/2; -MetaAtom_L/2];
+        
+        P1 = mult(T,P1);
+        P2 = mult(T,P2);
+        P3 = mult(T,P3);
+        P4 = mult(T,P4);
+        
+        vtx = [P1(1), P1(2); P2(1), P2(2); P3(1), P3(2); P4(1), P4(2)];
+        addpoly;
+        set("vertices",vtx);
+        #addrect;
+        #set("render type","wireframe");
+        set("x", Pos_x);
+        set("y", Pos_y);
+        set("z", 0);
+        #set("x span", MetaAtom_W);
+        #set("y span", MetaAtom_L);
+        set("z span", MetaAtom_H);
+        set("material", MetaAtom_Material);
+        name = "MetaAtom ("+num2str(x)+", "+num2str(y)+")";
+        set("name", name);
+        addtogroup("MetaAtom_Group");
+        Pos_x = Pos_x + Unit;
+    }
+    Pos_y = Pos_y + Unit;
+    Pos_x = -N_y/2*Unit + Unit/2;
+    ?"( " + num2str((y-1)*N_x + x) + " of " + num2str(N_x * N_y) + " )"; #Show progress
+}
+
+
+addtfsf;
+set("name", "source_X");
+set("injection axis","z");
+#set("direction", "Forward");
+set("x", 0);
+set("x span",Unit*(N_x+1));
+set("y", 0);
+set("y span",Unit*(N_y+1));
+zmax = getnamed("MetaAtom_Group::MetaAtom (1, 1)", "z max") + (1/4)*Lambda;
+zmin = getnamed("MetaAtom_Group::MetaAtom (1, 1)", "z min") - (1/4)*Lambda;
+set("z max", zmax);
+set("z min", zmin);
+set("wavelength start", Lambda);
+set("wavelength stop", Lambda);
+set("amplitude", sqrt(2)/2);
+set("polarization angle", 0);
+set("phase", 0);
+
+addtfsf;
+set("name", "source_Y");
+set("injection axis","z");
+#set("direction", "Forward");
+set("x", 0);
+set("x span",Unit*(N_x+1));
+set("y", 0);
+set("y span",Unit*(N_y+1));
+zmax = getnamed("MetaAtom_Group::MetaAtom (1, 1)", "z max") + (1/4)*Lambda;
+zmin = getnamed("MetaAtom_Group::MetaAtom (1, 1)", "z min") - (1/4)*Lambda;
+set("z max", zmax);
+set("z min", zmin);
+set("wavelength start", Lambda);
+set("wavelength stop", Lambda);
+set("amplitude", sqrt(2)/2);
+set("polarization angle", 90);
+set("phase", 90);
+
+addpower;
+set("name","field_profile_monitor");
+# 1 = point, 2 = linear x, 3 = linear y, 4 = linear z,
+# 5 = 2D x-normal, 6 = 2D y-normal, 7 = 2D z-normal, 8 = 3D
+set("monitor type",7);
+set("x", 0);
+set("x span",Unit*(N_x)*2);
+set("y", 0);
+set("y span",Unit*(N_y)*2);
+zm = getnamed("MetaAtom_Group::MetaAtom (1, 1)", "z max") + 2/4*Lambda;
+set("z", zm);
+
+addfdtd;
+set("dimension",2);  #  1 = 2D, 2 = 3D
+set("x", 0);
+set("x span",Unit*N_x+Lambda);
+set("y", 0);
+set("y span",Unit*N_y+Lambda);
+zmax = getnamed("MetaAtom_Group::MetaAtom (1, 1)", "z max") + (3/4)*Lambda;
+zmin = getnamed("source_X", "z min") - (1/4)*Lambda;
+set("z min", zmin);
+set("z max", zmax);
+set("auto shutoff min", 1e-5);
+#set("pml layers", 24);
+set("simulation time", 2000*fs);
+
+?"[BUILD COMPLETE]";
