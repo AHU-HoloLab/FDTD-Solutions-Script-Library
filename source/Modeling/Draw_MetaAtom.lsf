@@ -31,6 +31,6 @@ function Draw_MetaAtom_PB(filename, Unit, MetaAtom_W, MetaAtom_L, MetaAtom_H, Me
     adduserprop("Unit", 2, Unit);
     adduserprop("MetaAtom_Material", 5, MetaAtom_Material);
     
-    script = read("./core/PB.txt"); 
+    script = read("./core/PB_Holographic.txt"); 
     set("script", script); 
 }
