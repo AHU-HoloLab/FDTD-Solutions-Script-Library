@@ -38,6 +38,7 @@ SiO2 = "SiO2 (Glass) - Palik";
 Si3N4 = "Si3N4 (Silicon Nitride) - Phillip";
 Au = "Au (Gold) - Palik";
 Ag = "Ag (Silver) - Palik (0-2um)";
+ethc = "etch";
 
 # 以下材料若要使用需要先导入
 TiO2 = "TiO2 (Nanoparticles) - (405-635nm)";
@@ -139,6 +140,10 @@ set("z max", zmax);
 set("auto shutoff min", 1e-5);
 #set("pml layers", 24);
 set("simulation time", 2000*fs);
+
+# 保存工程
+#filename = OUTPATH+NAME;
+#save(filename);
 
 # 输出完成信息
 ?"[BUILD COMPLETE]";
