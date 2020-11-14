@@ -68,6 +68,7 @@ image(z, x, transpose(pinch(abs(RCP))), "z", "x", "RCP");
 
 ######################### 导出数据到 MATLAB ##########################
 
-matlabsave("lumerical_workspace_variables.mat");
+prefix = filebasename(currentfilename());
+matlabsave(prefix + "_[planeXZ-Analysis].mat");
 
 ?"[INFO] 运行结束";
