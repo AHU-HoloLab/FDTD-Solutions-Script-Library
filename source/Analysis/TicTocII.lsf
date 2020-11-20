@@ -1,0 +1,48 @@
+function Second_To_Time(second)
+{
+    day  = floor(second / (24*60*60));
+    hour = floor(mod(second, 24*60*60) / 3600);
+    mins = floor(mod(second, 60*60) / 60);
+    sec  = floor(mod(second, 60));
+    ret  = [day, hour, mins, sec];
+    return ret;
+}
+
+function tic()
+{
+    fname_tic = "tic.txt";    # file name to store current time 
+    if(fileexists(fname_tic))
+    {
+        rm(fname_tic);# delete time file   
+    }
+    second = now();
+    write(fname_tic, num2str(second));
+    #return 0;   
+}
+
+function toc()
+{
+    fname_tic = "tic.txt";    # file name to store reference time 
+    fname_toc = "toc.txt";    # file name to store current time 
+    if(fileexists(fname_toc))
+    {
+        rm(fname_toc);# delete time file   
+    }
+    if(~fileexists(fname_tic))
+    {
+        ?"Error: did not use 'tic' before 'toc'";
+    } 
+    second = now();
+    write(fname_toc, num2str(second)); 
+    if(fileexists(fname_tic))
+    {
+        ref_time = str2num(read(fname_tic));
+        cur_time = str2num(read(fname_toc));
+        TimeDiff = cur_time - ref_time;
+        ret = Second_To_Time(floor(TimeDiff/1000));        
+        ?"Elapsed time is " + num2str(ret(1)) + " day " + num2str(ret(2)) + " hour " + num2str(ret(3)) + " min " + num2str(ret(4)) + " sencond." ;# delete time file
+    }
+    rm(fname_toc); 
+    rm(fname_tic);
+    return ret;   
+}
