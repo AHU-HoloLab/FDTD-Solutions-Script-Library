@@ -6,6 +6,7 @@
 
 clear;
 closeall;
+TicTocII;
 
 # 长度
 m  = 1e-0;
@@ -22,6 +23,8 @@ lambda_green = 532*nm;
 lambda_blue  = 473*nm;
 
 ############################ 宏定义结束 ############################
+
+tic();
 
 ########################## 远场投影参数定义 #########################
 
@@ -52,9 +55,13 @@ ELCP = abs(LCP);
 
 plot(z/um, ERCP, "z", "|E|", "", "plot type=line, color=blue, linewidth=2");
 
+runtime = toc();
+
 ######################### 导出数据到 MATLAB ##########################
 
 prefix = filebasename(currentfilename());
 matlabsave(prefix + "_[AxisZ-Analysis].mat");
+
+
 
 ?"[INFO] 运行结束";

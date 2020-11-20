@@ -40,7 +40,7 @@ function toc()
         cur_time = str2num(read(fname_toc));
         TimeDiff = cur_time - ref_time;
         ret = Second_To_Time(floor(TimeDiff/1000));        
-        ?"Elapsed time is " + num2str(ret(1)) + " day " + num2str(ret(2)) + " hour " + num2str(ret(3)) + " min " + num2str(ret(4)) + " sencond." ;# delete time file
+        ?"运行时长: " + num2str(ret(1)) + " day " + num2str(ret(2)) + " hour " + num2str(ret(3)) + " min " + num2str(ret(4)) + " sencond." ;# delete time file
     }
     rm(fname_toc); 
     rm(fname_tic);
