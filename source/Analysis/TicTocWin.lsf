@@ -1,3 +1,5 @@
+# 由于 TicToc.lsf 在中文版 Windows OS 下存在 BUG. 采用 now() 方式实现
+
 function Second_To_Time(second)
 {
     day  = floor(second / (24*60*60));

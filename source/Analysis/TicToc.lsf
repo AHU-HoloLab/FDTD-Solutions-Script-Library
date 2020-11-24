@@ -1,3 +1,5 @@
+# 中文版 Winodws OS 环境请使用 TicTocWin.lsf
+
 function year_to_day(year)
 {
     days = (year-2000)*365 + floor((year-2000)/4)+1;#number of days from Jan 1st,2000 to Jan 1st, current year.

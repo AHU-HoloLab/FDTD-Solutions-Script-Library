@@ -6,7 +6,7 @@
 
 clear;
 closeall;
-TicTocII;
+TicTocWin; tic(); # 运行计时
 
 # 长度
 m  = 1e-0;
