@@ -8,6 +8,7 @@
 
 clear;
 closeall;
+TicTocWin; tic(); # 运行计时
 
 # 长度
 m  = 1e-0;
@@ -87,7 +88,13 @@ nx = linspace(x_start/2, x_end/2, resolution/2);
 ny = linspace(y_start/2, y_end/2, resolution/2);
 image(nx ,ny, ret, "x", "y", "Correction");
 
-###################################################################
+runtime = toc();
+
+######################### 导出数据到 MATLAB ##########################
+
+prefix = filebasename(currentfilename());
+matlabsave(prefix + "_[FarField].mat");
+
 
 ?"[INFO] 运行结束";
 
