@@ -1,0 +1,25 @@
+clear;
+closeall;
+TicTocWin; tic(); # 运行计时
+
+# 长度
+mm = 1e-3;
+um = 1e-6;
+nm = 1e-9;
+
+mname = "field_profile_monitor"; #近场监视器名字
+index = 1; # 远场传播背景材料真空
+lambda = c/getdata(mname,"f"); # 波长
+
+Ex = getresult(mname, "Ex");
+Ey = getresult(mname, "Ey");
+
+RCP = Ex + Ey*1i; # 右旋圆偏振
+LCP = Ex - Ey*1i; # 左旋圆偏振
+
+runtime = toc();
+
+prefix = filebasename(currentfilename());
+matlabsave(prefix + "_[getNearField].mat");
+
+?"[INFO] 运行结束";
